@@ -1,0 +1,8 @@
+useDynLib(BFDCA)
+exportPattern("^[[:alpha:]]+")
+import(Matrix)
+importFrom(Rcpp, evalCpp)
+importFrom(WGCNA, adjacency.fromSimilarity,pickSoftThreshold.fromSimilarity,TOMsimilarity,plotDendroAndColors)
+importFrom(flashClust,flashClust)
+importFrom(dynamicTreeCut,cutreeDynamic)
+importFrom(igraph,graph.empty,graph.adjacency,minimum.spanning.tree,get.adjacency,write_graph)

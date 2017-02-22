@@ -1,0 +1,3 @@
+PKG_LIBS = -L"C:/Program Files (x86)/GnuWin32/bin" -lgsl -lgslcblas -lm
+PKG_CXXFLAGS=-I"C:/Program Files (x86)/GnuWin32/include"
+

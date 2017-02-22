@@ -1,0 +1,127 @@
+---
+title: "BFWGCNA Vignette for Monsanto"
+author: "Duolin Wang"
+date: "Friday, February 05, 2016"
+output: html_document
+---
+
+This is a vegnette for package BFWGCNA. In this package we designed a pair-wise bayes factor to measure the level of differential co-expression of two genes under two different conditions by using gene expression data. This package contains two methods to do the analysis, both of them are based on pair-wise bayes factor. One method incorporates WGCNA to detect differential co-expression gene modules, the other method estimates global gene importance by PageRank algorithm.
+
+### Installation:
+By far package BFWGCNA can only be run on linux. Put package BFWGCNA_1.0.tar.gz in a directory then install it in R environment from this directory.
+To install BFWGCNA, several other required packages need to be installed first. To install the required packages and BFWGCNA, simply type: 
+```{r eval=FALSE}
+source("http://bioconductor.org/biocLite.R") 
+biocLite(c("AnnotationDbi", "impute", "GO.db", "preprocessCore")) 
+install.packages("flashClust")
+install.packages("WGCNA")
+install.packages("igraph")
+install.packages("dynamicTreeCut ")
+install.packages("/folder/BFWGCNA_1.0.tar.gz")  # if BFWGCNA_1.0.tar.gz exists in directory "folder"
+}
+```
+### Step-by-step BFWGCNA running on simulation data:
+* Step1, load simulation data.
+```{r eval=FALSE}
+library(BFWGCNA)
+data(SimulationSmall)
+#SimulationSmall is a matrix containing class information and expression data.  The first column correspond to class, other columns correspond to genes and rows to samples. Details in BFWGCNA Manual.
+class<-SimulationSmall[,1];#Extract class from SimulationSmall:
+gene<-SimulationSmall[,2:dim(SimulationSmall)[2]];#Extract expression data from SimulationSmall
+```
+* Step2, caculate the pair-wise bayes factors from expression matrix and class.
+```{r eval=FALSE}
+bfmatrix<-Compute_bf(gene,class,permutation=TRUE,20,6);
+#bfmatrix is a data frame containing the information of pair-wise bayes factors. All methods in this pages are based on it. It can be used as an input for other functions, like BF_WGCNA and BF_pagerank.
+save(bfmatrix,file="bfmatrix.Rdata");
+write.table(bfmatrix,file="bfmatrix.txt",append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE);
+#output the resulting pair-wise bayes factors into bfmatrix.txt.
+```
+* Step3, generate differential co-expression modules through pair-wise bayes factors.
+```{r eval=FALSE}
+obt<-BF_WGCNA(bfmatrix,pthres=0.05,plotTree=TRUE,plotfile="Gene_dendrogram_and_module_colors.pdf",minClusterSize=5,softPower=6,deepSplit=2);
+#details in BFWGCNA Manual.
+```
+![](smallplot.png)
+Figure 1: Gene dendrogram with true module colors for simulation data.
+
+* Step4, output the resulting differential co-expression modules and some information of gene-gene interactions.
+```{r eval=FALSE}
+bfoutput<-BF_output_networks(gene,class,obt,showMST2=TRUE,mst2file="mst2",bfthr=6,pthres=0.05,corthres=0.2); 
+#bfoutput is a list, it contains two elements: genegroups and network. Details in BFWGCNA Manual.
+
+write.table(bfoutput$genegroups[output$genegroups$labels!=0,],file="gene_groups.txt",append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
+#output the resulting differential co-expression modules into gene_groups.txt (discard genes which are unassigned).
+write.table(bfoutput$network,file="gene_network.txt",append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
+#output the resulting gene-gene interactions into gene_network.txt
+```
+### Estimate global gene importance by PageRank algorithm.
+#### Test on simulation data
+After running step1,
+```{r eval=FALSE}
+load("bfmatrix.Rdata");
+page<-BF_pagerank(bfmatrix,bfthr=6,pthres=0.05,d=0.85);
+write.table(page,file="gene_ranks.txt",append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
+#output the resulting gene ranks into gene_ranks.txt
+```
+
+### Step-by-step BFWGCNA running on Monsanto data. Taking new gene expression data of tissue2 and trait43 as an example:
+* Step1, load data.
+```{r eval=FALSE}
+library(BFWGCNA);
+read.table("discrete_tissue2_Trait43nohead_data",header=FALSE,sep=" ")->data;
+# file "discrete_tissue2_Trait43nohead_data" is a matrix containing class information and expression after preprocessing (gene selection and phenotype discretization). The first column correspond to class, other columns correspond to genes and rows to samples. 
+gene<-data[,2:dim(data)[2]];#Extract expression data
+class<-data[,1];#Extract class
+read.table("discrete_tissue2_Trait43head",header=FALSE,sep=" ")->genenames;
+# file "discrete_tissue2_Trait43head" contains the colnames of data, separated by space.
+names<-as.matrix(genenames[1,2:dim(genenames)[2]]);# extract the colnames from genenames.
+colnames(gene)<-names[1,];#assign names to gene.
+```
+* Step2, caculate the pair-wise bayes factors from expression matrix and class.
+```{r eval=FALSE}
+folder="./permutation100/";
+Compute_bf(gene,class,permutation=TRUE,100,6)->bfmatrix;
+save(bfmatrix,file=paste(folder,"bfmatrix_100_tissue2Trait43",sep=""));
+write.table(bfmatrix,file=paste(folder,"bfmatrix_100_tissue2Trait43.txt",sep=""),append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE);
+```
+* Step3, choose the soft-thresholding power by analysing of network topology
+```{r eval=FALSE}
+load(paste(folder,"bfmatrix_100_tissue2Trait43",sep=""));
+BF_Similarity(bfmatrix)->bfsimilarity;# Convert pair-wise bayes factors into network adjacency
+powerlist=c(1:10);# candidate soft-thresholding powers
+SelectPower(bfsimilarity,c(1:10));# plots a network topology under a set of candidate soft-thresholding powers
+```
+![](power.png)
+
+Figure 2: The left panel shows the scale-free fit index (y-axis) as a function of the soft-thresholding power (x-axis). The right panel shows the mean connectivity (degree, y-axis) as a function of the soft-thresholding power (x-axis). According to WGCNA, we choose softPower=1, which is the lowest power for which the scale-free topology fit index reaches 0.90. Details in BFWGCNA Manual.
+
+* Step4, generate differential co-expression modules through pair-wise bayes factors.
+```{r eval=FALSE}
+BF_WGCNA(bfmatrix,plotTree=TRUE,plotfile=paste(folder,"Tree_tissue2_trait43",sep=""),softPower=1,deepSplit=1,minClusterSize=20)->obt;
+save(obt,file=paste(folder,"obt_tissue2Trait43",sep=""));
+```
+![](Tree_tissue2_trait43.png)
+Figure 3: Hierarchical clustering dendrogram and color annotations of modules in "Tree_tissue2_trait43".
+
+* Step5, output the resulting differential co-expression modules and some information of gene-gene interactions.
+```{r eval=FALSE}
+load(paste(folder,"obt_tissue2Trait43",sep=""));
+BF_output_networks(gene,class,obt,showMST2=TRUE,mst2file="mst2",bfthr=6,pthres=0.05,corthres=0.2)->output;
+
+write.table(output$genegroups[output$genegroups$labels!=0,],file=paste(folder,"gene_groups_tissue2_trait43",sep=""),append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
+#output the resulting differential co-expression modules into gene_groups_tissue2_trait43.txt (discard genes which are unassigned).
+write.table(output$network,file=paste(folder,"gene_network_100_tissue2_trait43",sep=""),append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
+#output the resulting gene-gene interactions into gene_network_100_tissue2_trait43.txt
+```
+### Estimate global gene importance by PageRank algorithm.
+#### For new gene expression data of tissue2 and trait43.
+After running step1,
+```{r eval=FALSE}
+folder="./permutation100/";
+load(paste(folder,"bfmatrix_100_tissue2Trait43",sep=""));
+page<-BF_pagerank(bfmatrix,bfthr=6,pthres=0.01,d=0.85);
+write.table(page,file="pagerank_tissue2_trait43.txt",append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
+#output the resulting gene ranks into gene_ranks.txt
+```
+

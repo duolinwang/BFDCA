@@ -1,0 +1,14 @@
+Package: BFDCA
+Type: Package
+Title: A Comprehensive Tool of Using Bayes Factor for Differential Co-expression Analysis
+Version: 1.0
+Date: 2015-10-18
+Author: Duolin Wang
+Maintainer: Duolin Wang <deepduoduo@gmail.com>
+Description: BFDCA is a comprehensive tool of using Bayes factor for Differential Co-expression (DC) analysis. BFDCA contains three main functions: (1) clustering condition-specific genes into functional DC subunits; (2) quantitatively characterizing the regulatory impact of genes based on their differential connectivity within DC structures; and (3) providing a DC based prediction model to predict case/control conditions/phenotypes by taking DC significant gene pairs as markers.
+License: GPL (>= 2)
+Imports: Rcpp (>= 0.12.0), dynamicTreeCut (>= 1.62), flashClust, WGCNA,igraph
+LinkingTo: Rcpp
+Depends:R (>= 3.0),Matrix
+NeedsCompilation: yes
+
