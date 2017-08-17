@@ -6,7 +6,7 @@ date: Friday, February 05, 2016
 
 BFDCA is a comprehensive tool of using Bayes factor for Differential Co-expression (DC) analysis. BFDCA contains three main functions: (1) clustering condition-specific genes into functional DC subunits; (2) quantitatively characterizing the regulatory impact of genes based on their differential connectivity within DC structures; and (3) providing a DC based prediction model to predict case/control phenotypes by taking DC significant gene pairs as markers. 
 
-This is a vegnette for R package BFDCA.
+This is a vegnette for R package BFDCA. For other details about BFDCA please refer to the BFDCA-manual.pdf.
 ### System prerequisite:
  
  * R version 3.0.0 or higher. 
@@ -14,12 +14,12 @@ This is a vegnette for R package BFDCA.
  * Linux systems. It has been tested on several linux systems, including CentOS release 6.7, Red Hat Enterprise Linux Server release 5.11, Fedora21. 
  
  * The GNU Scientific Library (GSL). It's included in most GNU/Linux distributions. But if your system doesn't contain it, please refer to "https://www.gnu.org/software/gsl/" for installation. As an example, in Fedora system, you can easily install GSL by: 
-```
+```{r eval=FALSE}
 yum install gsl_devel
 ```
 ### Installation of BFDCA:
 Before install the BFDCA package, the following packages are required to be installed: fastcluster, WGCNA and its depends, igraph, and dynamicTreeCut (>=1.62). For some linux systems you may need to install Rcpp. To install the required packages, in R environment, simply type: 
-```
+```{r eval=FALSE}
 source("http://bioconductor.org/biocLite.R") 
 biocLite(c("AnnotationDbi", "impute", "GO.db", "preprocessCore")) 
 install.packages("flashClust")
@@ -29,13 +29,13 @@ install.packages("dynamicTreeCut")
 install.packages("Rcpp")
 ```
 Then install package BFDCA by typing the followings in R environment:
-```
+```{r eval=FALSE}
 install.packages("${your_directory}/BFDCA_1.0.tar.gz")  # ${your_directory} is the directory you save BFDCA_1.0.tar.gz.
 ```
 
 ### Analyses of simulation data (step-by-step):
 * Step1, load simulation data.
-```
+```{r eval=FALSE}
 library(BFDCA) # load the BFDCA package.
 
 data(SimulationSmall)
