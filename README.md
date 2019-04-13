@@ -17,6 +17,10 @@ This is a vegnette for R package BFDCA. For other details about BFDCA please ref
 ```{r eval=FALSE}
 yum install gsl_devel
 ```
+In Ubuntu system, you can easily install GSL by :
+```{r eval=FALSE}
+sudo apt-get install libgsl-dev
+```
 ### Installation of BFDCA:
 Before install the BFDCA package, the following packages are required to be installed: fastcluster, WGCNA and its depends, igraph, and dynamicTreeCut (>=1.62). For some linux systems you may need to install Rcpp. To install the required packages, in R environment, simply type: 
 ```{r eval=FALSE}
