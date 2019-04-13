@@ -53,7 +53,7 @@ gene<-SimulationSmall[,2:dim(SimulationSmall)[2]];
 
 ```{r eval=FALSE}
 bfmatrix<-Compute_bf(gene,class,classlabel=c("1","2"),bfthr=NULL,echo=TRUE);
-#bfmatrix is a data frame containing the information of pair-wise Bayes factors. It can be used as an input for other functions, like BF_WGCNA. 
+#bfmatrix is a data frame containing the information of pair-wise Bayes factors. It can be used as an input for other functions, like BF_WGCNA. run ?Compute_bf to see the helps.
 #argument bfthr is set as NULL, so all the gene pairs will be kept for the following steps. 
 #details are in the manual of BFDCA.
 save(bfmatrix,file="bfmatrix.Rdata");
@@ -65,7 +65,7 @@ in_groupgenes=20;
 truemodule<-rep(c(rep("grey",2*in_groupgenes),rep("yellow",in_groupgenes),rep("blue",in_groupgenes),rep("red",in_groupgenes),rep("pink",in_groupgenes),rep("brown",in_groupgenes),rep("grey",100)));
 #truemodule is a vector represents the colors assigned to the real DC modules in the simulation data.   
 obt<-BF_WGCNA(gene,bfmatrix,bfthr=0,keepedges=0,plotTree=TRUE,plotfile="Gene_dendrogram_and_module_colors.pdf",trueModule=truemodule,minClusterSize=5,softPower=4,deepSplit=2);
-#in this step, WGCNA package is applied on the Bayes factor matrix (bfmatrix) to infer DC modules. After running this function, a BFobt object will be generated and stored in obt. A plot (Figure 1) of a hierarchical clustering dendrogram and color annotations of modules will be in file "Gene_denfrogram_and_module_colors.pdf".
+#in this step, WGCNA package is applied on the Bayes factor matrix (bfmatrix) to infer DC modules. After running this function, a BFobt object will be generated and stored in obt. A plot (Figure 1) of a hierarchical clustering dendrogram and color annotations of modules will be in file "Gene_denfrogram_and_module_colors.pdf". run ?BF_WGCNA to see the helps.
 ```
 ![](smallplot.png)
 
@@ -78,7 +78,7 @@ bfoutput<-BF_output_networks(gene,class,classlabel=c("1","2"),obt,mst2file="MST2
 #(1) information for DC gene nodes, including module assignment and weight assignment.
 #(2) information for DC gene pairs, including a full network built based on DC modules. 
 #the essential links among genes represented by a union of First and Second Minimal Spanning Tree (MST2) will be outputed into file "MST2.txt" specified by argument mst2file.
-#Other arguments and details can be found in manual of BFDCA.
+#Other arguments and details can be found in manual of BFDCA. You can also run ?BF_output_networks to see the helps.
 
 write.table(bfoutput$genegroups,file="gene_groups.txt",append=FALSE,row.names=FALSE,col.names=TRUE,quote=FALSE,sep="\t");
 #output the DC gene nodes with information of DC modules into "gene_groups.txt".
