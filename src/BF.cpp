@@ -102,11 +102,11 @@ double logLikCont( gsl_matrix *C){
 		// calculate log-likelihood with one col of data
 		P = -1*log(M_PI) * (double)nObs/2 + log(kappa/(kappa+nObs))/2 + gsl_sf_lngamma((v0+nObs)/2);
 		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");
+                throw std::range_error("error in logLikCont 1: p is NA.");
 		}
 		P += -1*gsl_sf_lngamma(v0/2) + log(v0*pow((double)sigma,2)) * v0/2 - log(v0Var) * (v0+nObs)/2;
 		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");			
+                throw std::range_error("error in logLikCont 2: p is NA.");			
 		}
 		
 	} 
@@ -152,26 +152,33 @@ double logLikCont( gsl_matrix *C){
 		
 		// calculate log-likelihood
 		P = -log(M_PI) * (double)nObs*nVar/2 + log(kappa/(kappa+nObs)) * (double)nVar/2;
-		if(isnan(P)){
+		/*if(isnan(P)){
 
-                throw std::range_error("error in logLikCont: p is NA.");
+                throw std::range_error("error in logLikCont 3: p is NA.");
 		
 	       	}
-		P += log(gsl_linalg_LU_det(lambda, s1)) * v0/2;
+		*/
+        P += log(gsl_linalg_LU_det(lambda, s1)) * v0/2;
 
-		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");			
+		/*if(isnan(P)){
+                throw std::range_error("error in logLikCont 4: p is NA.");			
 			}
+        */    
+        /*Rcpp::Rcout<<gsl_matrix_get(lambdaN,0,0)<<std::endl;
+        Rcpp::Rcout<<gsl_matrix_get(lambdaN,0,1)<<std::endl;
+        Rcpp::Rcout<<gsl_matrix_get(lambdaN,1,0)<<std::endl;
+        Rcpp::Rcout<<gsl_matrix_get(lambdaN,1,1)<<std::endl;
+        */
 		P -= log(gsl_linalg_LU_det(lambdaN, s2)) * (v0+nObs)/2;
-		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");	 
-		}
+		/*if(isnan(P)){
+                throw std::range_error("error in logLikCont 5: p is NA.");	 
+		}*/
 		
 		for(i=0; i<nVar; i++){
 			P += gsl_sf_lngamma((v0+nObs)/2 - (double)i/2) - gsl_sf_lngamma(v0/2 - (double)i/2);
-		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");
-		}
+		/*if(isnan(P)){
+                throw std::range_error("error in logLikCont 6: p is NA.");
+		}*/
 		}
 		
 		delete [] means;
@@ -203,13 +210,13 @@ double logLikCont_vector( gsl_vector *v){
 			v0Var += kappa*nObs/(kappa+nObs) * pow((gsl_stats_mean((*v).data,1,nObs) - mu),2);
 		// calculate log-likelihood with one col of data
 		P = -1*log(M_PI) * (double)nObs/2 + log(kappa/(kappa+nObs))/2 + gsl_sf_lngamma((v0+nObs)/2);
-		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");			
-			}
+		/*if(isnan(P)){
+                throw std::range_error("error in logLikCont 7: p is NA.");			
+			}*/
 		P += -1*gsl_sf_lngamma(v0/2) + log(v0*pow((double)sigma,2)) * v0/2 - log(v0Var) * (v0+nObs)/2;
-		if(isnan(P)){
-                throw std::range_error("error in logLikCont: p is NA.");
-		}
+		/*if(isnan(P)){
+                throw std::range_error("error in logLikCont 8: p is NA.");
+		}*/
 	return P;
 }
 
@@ -294,6 +301,7 @@ try{	int nObs = C->size2;
  if(isnan(p_down))p_down=max(max(p4,p5),p6);
  	      
  long double bf=(long double)2*(p_up-p_down);
+ if(isnan(bf)){bf=0;}
  if(bf>bfthres)
  {
    if(p1>p2 && p1>p3){
